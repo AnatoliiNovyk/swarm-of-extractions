@@ -11,3 +11,4 @@ vendor/
 .env
 package-lock.json
 package.json
+c2_activity.log
