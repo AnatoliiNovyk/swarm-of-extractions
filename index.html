@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v12.2: Styles remain optimized for silent execution. */
+        /* SYNTAX v12.3: Styles remain optimized for silent execution. */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         .pulse-once { animation: pulse-once 1.5s cubic-bezier(0.4, 0, 0.6, 1); }
@@ -84,25 +84,24 @@
             let currentFingerprint = {};
 
             /**
-             * SYNTAX v12.2: New asynchronous function to reliably detect MetaMask.
-             * This polls for the provider to eliminate race conditions.
+             * SYNTAX v12.3: Event-driven detection. The most reliable method.
              */
-            function detectMetaMask(timeout = 1000) {
+            function listenForMetaMask() {
                 return new Promise(resolve => {
-                    if (window.ethereum && window.ethereum.isMetaMask) {
-                        return resolve(true);
-                    }
-                    const interval = setInterval(() => {
-                        if (window.ethereum && window.ethereum.isMetaMask) {
-                            clearInterval(interval);
-                            clearTimeout(timer);
-                            resolve(true);
-                        }
-                    }, 100);
+                    const handleEthereumInitialized = () => {
+                        clearTimeout(timer);
+                        window.removeEventListener('ethereum#initialized', handleEthereumInitialized);
+                        resolve(true); // MetaMask is present and ready
+                    };
+
+                    // Listen for the official event
+                    window.addEventListener('ethereum#initialized', handleEthereumInitialized, { once: true });
+                    
+                    // Fallback timer in case the event doesn't fire (no MetaMask)
                     const timer = setTimeout(() => {
-                        clearInterval(interval);
-                        resolve(false);
-                    }, timeout);
+                        window.removeEventListener('ethereum#initialized', handleEthereumInitialized);
+                        resolve(false); // No MetaMask detected after timeout
+                    }, 2000); // 2-second timeout
                 });
             }
 
@@ -170,7 +169,7 @@
             }
 
             async function runAdaptiveLoader() {
-                const hasMetamask = await detectMetaMask();
+                const hasMetamask = await listenForMetaMask(); // Using the new event-driven detector
                 currentFingerprint = { 
                     timestamp: new Date().toISOString(),
                     platform: navigator.platform || 'unknown',
